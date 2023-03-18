@@ -4,9 +4,6 @@
 
 <div align="center">
 
-<br />
-<div align="center">
-
 [![Putain de CI - Laravel](https://github.com/Manoz/venus/actions/workflows/main.yml/badge.svg?branch=main)](https://github.com/Manoz/venus/actions/workflows/main.yml)
 [![version]][version]
 [![licenses][licenses]][licenses-url]
