@@ -1,0 +1,66 @@
+{
+    "name": "manoz/venus",
+    "description": "A Laravel package that contains everything to write code without thinking about codestyle.",
+    "keywords": ["laravel", "eslint", "prettier", "php-cs-fixer", "duster", "pint"],
+    "type": "project",
+    "license": "MIT",
+    "support": {
+        "issues": "https://github.com/manoz/venus/issues",
+        "source": "https://github.com/manoz/venus"
+    },
+    "authors": [
+        {
+            "name": "Kevin Legrand",
+            "email": "manoz@outlook.com"
+        }
+    ],
+    "require": {
+        "php": "^8.0.2",
+        "illuminate/console": "^9.21|^10.0",
+        "illuminate/support": "^9.21|^10.0"
+    },
+    "require-dev": {
+        "laravel-zero/framework": "^10.0",
+        "mockery/mockery": "^1.5",
+        "pestphp/pest": "^1.22",
+        "tightenco/duster": "^1.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "Manoz\\Venus\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "App\\": "app/",
+            "Tests\\": "tests/"
+        }
+    },
+    "scripts": {
+        "fmt": [
+            "duster fix"
+        ],
+        "lint": [
+            "duster lint"
+        ]
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Manoz\\Venus\\VenusServiceProvider"
+            ]
+        }
+    },
+    "config": {
+        "sort-packages": true,
+        "optimize-autoloader": true,
+        "platform": {
+            "php": "8.1.0"
+        },
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

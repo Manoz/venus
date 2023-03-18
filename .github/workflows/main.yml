@@ -1,0 +1,30 @@
+name: Putain de CI - Laravel
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  lint-project:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Setup PHP
+      uses: shivammathur/setup-php@2.24.0
+      with:
+        php-version: '8.1'
+
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Install Dependencies
+      run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
+    - name: Lint PHP files
+      run: composer run-script lint
+
+    - name: Execute unit/feature tests
+      run: vendor/bin/pest

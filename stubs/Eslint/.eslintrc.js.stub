@@ -1,0 +1,51 @@
+module.exports = {
+  extends: ['eslint:recommended', 'plugin:import/recommended'],
+  env: {
+    browser: true,
+    es2022: true,
+    node: true,
+  },
+  ignorePatterns: [
+    '*.min.*',
+    '__snapshots__',
+    'coverage',
+    'dist',
+    'packages-lock.json',
+    'pnpm-lock.yaml',
+    'public',
+    'yarn.lock',
+    '!.prettierrc.js',
+    '!.prettierrc.cjs',
+  ],
+  overrides: [
+    {
+      files: ['*.cjs', '*.mjs'],
+    },
+  ],
+  parserOptions: {
+    ecmaFeatures: {
+      jsx: true,
+    },
+    sourceType: 'module',
+  },
+  rules: {
+    'array-callback-return': 'error',
+    eqeqeq: ['error', 'always', { null: 'ignore' }],
+    'no-console': ['error', { allow: ['warn', 'error'] }],
+    'no-use-before-define': ['error', { classes: false, functions: false, variables: false }],
+    'no-var': 'error',
+    'prefer-arrow-callback': ['error', { allowNamedFunctions: true, allowUnboundThis: true }],
+    'prefer-const': ['error', { destructuring: 'any', ignoreReadBeforeAssign: true }],
+    'prefer-spread': 'error',
+    quotes: ['error', 'single'],
+
+    'import/first': 'error',
+    'import/no-unresolved': 'off',
+    'import/order': ['warn', { 'newlines-between': 'always', alphabetize: { order: 'asc', caseInsensitive: true } }],
+  },
+  settings: {
+    'import/resolver': {
+      node: { extensions: ['.js', '.cjs', '.mjs'] },
+    },
+  },
+};
