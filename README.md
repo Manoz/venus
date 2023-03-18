@@ -1,6 +1,7 @@
-<p align="center">
-  <img src="https://user-images.githubusercontent.com/1554207/226126172-a2ece26d-fe12-4048-a597-3245bf6876c3.svg" align="center" alt="venus"/>
-</p>
+<div align="center">
+  <h1>Venus</h1>
+  <p>A Laravel package that contains everything to write code without thinking about codestyle 🚀</p>
+</div>
 
 <div align="center">
 
