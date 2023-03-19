@@ -30,6 +30,7 @@ This package contains the following tools:
 -  **[ESLint](https://eslint.org/):** a tool for identifying and reporting on patterns found in ECMAScript/JavaScript code, with the goal of making code more consistent and avoiding bugs.
 - **[Duster](https://github.com/tighten/duster):** a tool for identifying and reporting on patterns found in PHP code, with the goal of making code more consistent and avoiding bugs.
 - **[Prettier](https://prettier.io/):** an opinionated code formatter. It enforces a consistent style by parsing your code and re-printing it with its own rules.
+- Complete front-end stack installation with **[PostCSS](https://postcss.org/)**, **[Tailwind CSS](https://tailwindcss.com/)** and **[Alpine.js](https://alpinejs.dev/)**.
 
 ## Installation
 
@@ -69,6 +70,19 @@ php artisan venus:install --prettier
 npm install
 ```
 
+**Install only the Front-end stack:**
+```bash
+php artisan venus:install --frontend
+
+npm install
+```
+
+Don't forget to import Tailwind CSS in your `resources/css/app.css` file:
+
+```css
+@import "./tailwind.css";
+```
+
 Each tool will have its own configuration file and dependencies.
 Everything will be installed for you and config files will be copied to your project.
 
@@ -91,6 +105,11 @@ You should check usage and options on the [Duster](https://github.com/tighten/du
 
 You can configure Prettier by editing the `.prettierrc.json` file in the root of your project. More informations can be found on the [Prettier website](https://prettier.io/docs/en/configuration.html).
 
+
+### Front-end stack
+
+Tailwind CSS and Alpine.js are already configured. You can extend Tailwind's configuration by editing the `tailwind.config.js` file in the root of your project. More informations can be found on the [Tailwind CSS website](https://tailwindcss.com/docs/configuration).
+
 ## Contributing
 
 Thank you for considering contributing to Venus! The contribution guide can be found [here](.github/CONTRIBUTING.md).
@@ -108,4 +127,4 @@ See [LICENSE](https://github.com/Manoz/venus/blob/main/LICENSE) for more informa
 [licenses-url]: https://github.com/Manoz/venus/blob/main/LICENSE
 [licenses]: https://img.shields.io/badge/license-MIT-blue.svg
 
-[version]: https://img.shields.io/badge/version-1.0.0-%23d85a94.svg
+[version]: https://img.shields.io/badge/version-1.1.0-%23d85a94.svg

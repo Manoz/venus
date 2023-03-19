@@ -14,6 +14,7 @@ class InstallCommand extends Command
      * @var string
      */
     protected $signature = 'venus:install {--all : Indicates that all optional packages should be installed}
+                                          {--frontend : Indicates if the front-end stack should be installed. It will install Tailwind CSS, Alpine JS, autoprefixer and PostCSS}
                                           {--duster : Indicates if Duster should be installed}
                                           {--eslint : Indicates if ESLint should be installed}
                                           {--prettier : Indicates if Prettier should be installed}
@@ -31,11 +32,11 @@ class InstallCommand extends Command
      */
     public function handle(): void
     {
-        if (! $this->option('all') && ! $this->option('duster') && ! $this->option('eslint') && ! $this->option('prettier')) {
+        if (! $this->option('all') && ! $this->option('duster') && ! $this->option('eslint') && ! $this->option('prettier') && ! $this->option('frontend')) {
             $this->warn('Please specify which packages you want to install.');
             $this->newLine();
             $this->line('You can use the --all option to install all packages at once.');
-            $this->line('You can also use the --duster, --eslint and --prettier options to install individual packages.');
+            $this->line('You can also use the --frontend, --duster, --eslint and --prettier options to install individual packages.');
             $this->newLine();
             $this->info('For more information, run "php artisan help venus:install".');
 
@@ -54,13 +55,20 @@ class InstallCommand extends Command
             $this->installPrettier();
         }
 
+        if ($this->option('frontend')) {
+            $this->installFrontEnd();
+        }
+
         if ($this->option('all')) {
             $this->installDuster();
             $this->installEslint();
             $this->installPrettier();
+            $this->installFrontEnd();
 
             $this->info('All packages installed successfully.');
             $this->info('Don\'t forget to run "npm i" to install the new dependencies.');
+            $this->warn('If you installed Tailwind CSS, don\'t forget to import it in your CSS file using:');
+            $this->warn('@import "./tailwind.css";');
         }
     }
 
@@ -69,10 +77,6 @@ class InstallCommand extends Command
      */
     protected function installDuster(): void
     {
-        if (! $this->option('all')) {
-            $this->info('Installing Duster...');
-        }
-
         $this->removeComposerDevPackages(['laravel/pint', 'friendsofphp/php-cs-fixer']);
 
         if (! $this->requireComposerDevPackages(['tightenco/duster:^1.1'])) {
@@ -85,7 +89,7 @@ class InstallCommand extends Command
         copy(__DIR__ . '/../../stubs/Duster/pint.json', base_path('pint.json'));
 
         if (! $this->option('all')) {
-            $this->info('Duster installed successfully and config files created.');
+            $this->successMessage('Duster');
         }
     }
 
@@ -94,10 +98,6 @@ class InstallCommand extends Command
      */
     protected function installEslint(): void
     {
-        if (! $this->option('all')) {
-            $this->info('Installing ESLint...');
-        }
-
         $this->updateNodePackages(function ($packages) {
             return [
                 'eslint' => '^8.36.0',
@@ -117,8 +117,7 @@ class InstallCommand extends Command
         copy(__DIR__ . '/../../stubs/Eslint/.eslintrc.js.stub', base_path('.eslintrc.js'));
 
         if (! $this->option('all')) {
-            $this->info('ESLint installed successfully and config files created.');
-            $this->info('Don\'t forget to run "npm i" to install the new dependencies.');
+            $this->successMessage('ESLint', true);
         }
     }
 
@@ -127,10 +126,6 @@ class InstallCommand extends Command
      */
     protected function installPrettier(): void
     {
-        if (! $this->option('all')) {
-            $this->info('Installing Prettier...');
-        }
-
         $this->updateNodePackages(function ($packages) {
             return [
                 'prettier' => '^2.5.1',
@@ -149,8 +144,50 @@ class InstallCommand extends Command
         copy(__DIR__ . '/../../stubs/Prettier/.prettierrc.json.stub', base_path('.prettierrc.json'));
 
         if (! $this->option('all')) {
-            $this->info('Prettier installed successfully and config files created.');
-            $this->info('Don\'t forget to run "npm i" to install the new dependencies.');
+            $this->successMessage('Prettier', true);
+        }
+    }
+
+    /**
+     * Install Front-end stack.
+     */
+    protected function installFrontEnd(): void
+    {
+        $this->updateNodePackages(function ($packages) {
+            return [
+                '@tailwindcss/forms' => '^0.5.3',
+                '@tailwindcss/typography' => '^0.5.9',
+                'autoprefixer' => '^10.4.14',
+                'cssnano' => '^5.1.15',
+                'postcss' => '^8.4.21',
+                'tailwindcss' => '^3.2.7',
+            ] + $packages;
+        });
+
+        $this->updateNodePackages(function ($packages) {
+            return [
+                'alpinejs' => '^3.12.0',
+            ] + $packages;
+        }, false);
+
+        // Copy configuration files
+        copy(__DIR__ . '/../../stubs/Frontend/postcss.config.js', base_path('postcss.config.js'));
+        copy(__DIR__ . '/../../stubs/Frontend/tailwind.config.js', base_path('tailwind.config.js'));
+        copy(__DIR__ . '/../../stubs/Frontend/tailwind.css', base_path('resources/css/tailwind.css'));
+
+        // Ask if we should backup existing app.js file
+        if ($this->confirm('Do you want to backup your existing app.js file?')) {
+            copy(base_path('resources/js/app.js'), base_path('resources/js/app.js.bak'));
+        }
+
+        // Copy new app.js file
+        copy(__DIR__ . '/../../stubs/Frontend/app.js', base_path('resources/js/app.js'));
+
+        if (! $this->option('all')) {
+            $this->successMessage('Front-end stack', true);
+
+            $this->warn('Also, don\'t forget to import Tailwind\'s CSS file in app.css file:');
+            $this->line('@import "./tailwind.css";');
         }
     }
 
@@ -257,20 +294,22 @@ class InstallCommand extends Command
     /**
      * Add the given npm package to the package.json file.
      */
-    protected static function updateNodePackages(callable $callback): void
+    protected static function updateNodePackages(callable $callback, bool $dev = true): void
     {
         if (! file_exists(base_path('package.json'))) {
             return;
         }
 
+        $dependenciesType = $dev ? 'devDependencies' : 'dependencies';
+
         $packages = json_decode(file_get_contents(base_path('package.json')), true);
 
-        $packages['devDependencies'] = $callback(
-            array_key_exists('devDependencies', $packages) ? $packages['devDependencies'] : [],
-            'devDependencies'
+        $packages[$dependenciesType] = $callback(
+            array_key_exists($dependenciesType, $packages) ? $packages[$dependenciesType] : [],
+            $dependenciesType
         );
 
-        ksort($packages['devDependencies']);
+        ksort($packages[$dependenciesType]);
 
         file_put_contents(
             base_path('package.json'),
@@ -284,5 +323,15 @@ class InstallCommand extends Command
     protected function phpBinary(): string
     {
         return (new PhpExecutableFinder)->find(false) ?: 'php';
+    }
+
+    protected function successMessage(string $stack, bool $npm = false): void
+    {
+        $this->info("{$stack} installed successfully and configuration files have been updated.");
+
+        if ($npm) {
+            $this->newLine();
+            $this->comment('Don\'t forget to run "npm install" to install the new dependencies.');
+        }
     }
 }
