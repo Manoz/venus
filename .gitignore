@@ -5,3 +5,7 @@ composer.phar
 /phpunit.xml
 /.idea
 /.vscode
+
+# OS files
+.DS_Store
+Thumbs.db
